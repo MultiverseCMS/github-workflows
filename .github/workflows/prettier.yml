@@ -1,0 +1,47 @@
+name: Prettier
+
+on:
+  workflow_call:
+    inputs:
+      node-version:
+        description: 'Node version to run scripts'
+        default: '20.x'
+        required: false
+        type: string
+      check:
+        description: 'Check prettier errors'
+        default: true
+        required: false
+        type: boolean
+      write:
+        description: 'Fix prettier errors'
+        default: false
+        required: false
+        type: boolean
+jobs:
+  prettier:
+    name: prettier
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node ${{ inputs.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ inputs.node-version }}
+          cache: yarn
+
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Check prettier
+        if: inputs.check
+        run: yarn prettier:check
+
+      - name: Run prettier
+        if: inputs.write
+        run: yarn prettier:write
